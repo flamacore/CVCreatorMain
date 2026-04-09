@@ -14,7 +14,7 @@ The current app supports:
 - per-area Markdown and HTML overrides
 - typography and layout controls including per-area line-height, paragraph spacing, and structured field gap
 - theme presets, app-shell theme presets, and layout presets with a custom layout mode
-- local autosave plus explicit `Save CV` / `Load CV`
+- explicit `Save CV` / `Load CV` document management
 - HTML export and real PDF export driven from the same rendering pipeline used by preview
 
 Document files are currently saved as `.cvcreator.json`.
@@ -61,7 +61,6 @@ cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
 
 ## Save / Load Behavior
 
-- The app keeps a local autosave while you work.
 - `Save CV` and `Load CV` manage any number of explicit document files.
 - In Tauri, save/load uses native dialogs and Rust file IO.
 - In browser dev mode, the app uses browser file APIs when available and falls back to upload/download behavior.

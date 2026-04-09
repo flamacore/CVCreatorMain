@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 
 import {
   appThemePresets,
@@ -25,18 +25,10 @@ import {
 } from "@cvcreator/document-model";
 import { analyzeLayoutSwitch } from "@cvcreator/template-engine";
 
-import { loadPersistedResume, savePersistedResume, type PersistenceMetadata } from "./persistence";
 import type { PersistedResumeSnapshot } from "./persistence";
 
 interface CompatibilityNotice {
   summary: string;
-}
-
-type SaveState = "hydrating" | "idle" | "saving" | "saved" | "error";
-
-interface PersistenceState extends PersistenceMetadata {
-  status: SaveState;
-  errorMessage: string | null;
 }
 
 const createId = (prefix: string) => `${prefix}-${crypto.randomUUID().slice(0, 8)}`;
@@ -85,24 +77,6 @@ export const useResumeBuilder = () => {
   const [document, setDocument] = useState<CVDocument>(createStarterDocument);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(document.sections[0]?.id ?? null);
   const [compatibilityNotice, setCompatibilityNotice] = useState<CompatibilityNotice | null>(null);
-  const [persistence, setPersistence] = useState<PersistenceState>({
-    runtime: "browser",
-    savedAt: document.updatedAt,
-    revisions: [],
-    status: "hydrating",
-    errorMessage: null,
-  });
-  const [hasHydrated, setHasHydrated] = useState(false);
-  const lastSavedPayloadRef = useRef<string | null>(null);
-
-  const currentSnapshot = useMemo(
-    () => ({
-      document,
-      selectedSectionId,
-    }),
-    [document, selectedSectionId],
-  );
-  const serializedSnapshot = useMemo(() => JSON.stringify(currentSnapshot), [currentSnapshot]);
 
   const selectedTheme = themePresets.find((theme) => theme.id === document.themeId) ?? themePresets[0];
   const selectedAppTheme = appThemePresets.find((theme) => theme.id === document.appThemeId) ?? appThemePresets[0];
@@ -117,114 +91,6 @@ export const useResumeBuilder = () => {
   }));
   const hiddenSections = librarySections.filter((section) => !section.isVisible);
   const hiddenCustomSections = document.sections.filter((section) => section.type === "custom" && !section.visible);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const hydrate = async () => {
-      try {
-        const restored = await loadPersistedResume();
-
-        if (!isMounted) {
-          return;
-        }
-
-        if (restored) {
-          const normalizedDocument = normalizeDocument(restored.document);
-          const nextSelection = restored.selectedSectionId ?? normalizedDocument.sections[0]?.id ?? null;
-          setDocument(normalizedDocument);
-          setSelectedSectionId(nextSelection);
-          lastSavedPayloadRef.current = JSON.stringify({
-            document: normalizedDocument,
-            selectedSectionId: nextSelection,
-          });
-          setPersistence({
-            runtime: restored.runtime,
-            savedAt: restored.savedAt,
-            revisions: restored.revisions,
-            status: "saved",
-            errorMessage: null,
-          });
-        } else {
-          setPersistence((current) => ({
-            ...current,
-            status: "idle",
-            errorMessage: null,
-          }));
-        }
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-
-        setPersistence((current) => ({
-          ...current,
-          status: "error",
-          errorMessage: error instanceof Error ? error.message : "Could not load saved data.",
-        }));
-      } finally {
-        if (isMounted) {
-          setHasHydrated(true);
-        }
-      }
-    };
-
-    void hydrate();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!hasHydrated) {
-      return;
-    }
-
-    if (lastSavedPayloadRef.current === serializedSnapshot) {
-      return;
-    }
-
-    let isCancelled = false;
-
-    setPersistence((current) => ({
-      ...current,
-      status: "saving",
-      errorMessage: null,
-    }));
-
-    const saveHandle = window.setTimeout(() => {
-      void savePersistedResume(currentSnapshot)
-        .then((result) => {
-          if (isCancelled) {
-            return;
-          }
-
-          lastSavedPayloadRef.current = serializedSnapshot;
-          setPersistence({
-            ...result,
-            status: "saved",
-            errorMessage: null,
-          });
-        })
-        .catch((error) => {
-          if (isCancelled) {
-            return;
-          }
-
-          setPersistence((current) => ({
-            ...current,
-            status: "error",
-            errorMessage: error instanceof Error ? error.message : "Could not save your document.",
-          }));
-        });
-    }, 700);
-
-    return () => {
-      isCancelled = true;
-      window.clearTimeout(saveHandle);
-    };
-  }, [currentSnapshot, hasHydrated, serializedSnapshot]);
 
   const resetDocument = () => {
     const starter = createStarterDocument();
@@ -241,15 +107,9 @@ export const useResumeBuilder = () => {
     const normalizedDocument = normalizeDocument(snapshot.document);
     const nextSelection = snapshot.selectedSectionId ?? normalizedDocument.sections[0]?.id ?? null;
 
-    lastSavedPayloadRef.current = null;
     setDocument(normalizedDocument);
     setSelectedSectionId(nextSelection);
     setCompatibilityNotice(null);
-    setPersistence((current) => ({
-      ...current,
-      status: "idle",
-      errorMessage: null,
-    }));
   };
 
   const moveSection = (sectionId: string, targetSectionId: string) => {
@@ -809,7 +669,6 @@ export const useResumeBuilder = () => {
     themePresets,
     layoutPresets,
     compatibilityNotice,
-    persistence,
     actions: {
       addCustomSection,
       addField,

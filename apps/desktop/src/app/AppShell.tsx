@@ -239,11 +239,6 @@ export const AppShell = ({ builder }: AppShellProps) => {
           void saveDocument();
         }}
         onThemeChange={builder.actions.setThemeId}
-        persistedAt={builder.persistence.savedAt}
-        persistenceRuntime={builder.persistence.runtime}
-        revisionCount={builder.persistence.revisions.length}
-        saveError={builder.persistence.errorMessage}
-        saveStatus={builder.persistence.status}
         selectedAppThemeId={builder.document.appThemeId}
         selectedLayoutId={builder.document.layoutId}
         selectedThemeId={builder.document.themeId}

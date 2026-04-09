@@ -4,11 +4,6 @@ interface CommandBarProps {
   title: string;
   fileLabel: string;
   updatedAt: string;
-  saveStatus: "hydrating" | "idle" | "saving" | "saved" | "error";
-  persistenceRuntime: "tauri" | "browser";
-  persistedAt: string;
-  revisionCount: number;
-  saveError: string | null;
   appThemePresets: ThemePreset[];
   selectedAppThemeId: string;
   themePresets: ThemePreset[];
@@ -34,11 +29,6 @@ export const CommandBar = ({
   title,
   fileLabel,
   updatedAt,
-  saveStatus,
-  persistenceRuntime,
-  persistedAt,
-  revisionCount,
-  saveError,
   appThemePresets,
   selectedAppThemeId,
   themePresets,
@@ -60,17 +50,6 @@ export const CommandBar = ({
   onReset,
 }: CommandBarProps) => {
   const updatedLabel = new Date(updatedAt).toLocaleString();
-  const saveLabel =
-    saveStatus === "hydrating"
-      ? "Loading local resume"
-      : saveStatus === "saving"
-        ? "Saving locally"
-        : saveStatus === "saved"
-          ? `Saved ${new Date(persistedAt).toLocaleTimeString()}`
-          : saveStatus === "error"
-            ? "Local save failed"
-            : "Ready to save";
-  const saveChipClassName = `status-chip${saveStatus === "saved" || saveStatus === "saving" ? " active" : ""}${saveStatus === "error" ? " error" : ""}`;
 
   return (
     <header className="command-bar panel">
@@ -79,10 +58,8 @@ export const CommandBar = ({
         <h1>{title}</h1>
         <div className="command-bar-meta-row">
           <span className="status-chip">Updated {updatedLabel}</span>
-          <span className={saveChipClassName}>{saveLabel}</span>
+          <span className="status-chip">File {fileLabel}</span>
         </div>
-        <p className="meta-copy command-bar-submeta">Runtime {persistenceRuntime} · File {fileLabel} · {revisionCount} retained revisions</p>
-        {saveError ? <p className="meta-copy error-copy">{saveError}</p> : null}
       </div>
 
       <div className="command-bar-controls">
