@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "CVCreator",
+  "version": "0.1.0",
+  "identifier": "com.cvcreator.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev --workspace=@cvcreator/desktop",
+    "beforeBuildCommand": "npm run build --workspace=@cvcreator/desktop",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "CVCreator",
+        "width": 1600,
+        "height": 1000,
+        "minWidth": 1200,
+        "minHeight": 820,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": false,
+    "targets": "all"
+  }
+}

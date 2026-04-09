@@ -1,0 +1,20 @@
+{
+  "name": "cvcreator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@cvcreator/desktop",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "tauri:dev": "npm run tauri:dev --workspace=@cvcreator/desktop",
+    "tauri:build": "npm run tauri:build --workspace=@cvcreator/desktop"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
