@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/flamacore/CVCreatorMain/compare/v1.0.0...v1.1.0) (2026-04-18)
+
+### Features
+
+* enhance section and item reordering with arrow buttons and remove drag-and-drop support ([3dbe2de](https://github.com/flamacore/CVCreatorMain/commit/3dbe2de5452b7667f7cc4088a6428024a875cf06))
+
 ## 1.0.0 (2026-04-18)
 
 ### Features
