@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/flamacore/CVCreatorMain/compare/v1.2.0...v1.3.0) (2026-04-18)
+
+### Features
+
+* update pdf export functionality to handle dynamic page height ([49e6bb8](https://github.com/flamacore/CVCreatorMain/commit/49e6bb805bf4b3f9549ba19b7652f2d6f2891cda))
+
 ## [1.2.0](https://github.com/flamacore/CVCreatorMain/compare/v1.1.2...v1.2.0) (2026-04-18)
 
 ### Features
