@@ -12,9 +12,21 @@
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "tauri:dev": "npm run tauri:dev --workspace=@cvcreator/desktop",
-    "tauri:build": "npm run tauri:build --workspace=@cvcreator/desktop"
+    "tauri:build": "npm run tauri:build --workspace=@cvcreator/desktop",
+    "tauri:build:nsis": "npm run tauri:build:nsis --workspace=@cvcreator/desktop",
+    "release:semantic": "semantic-release",
+    "release:windows:cert": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/windows/new-self-signed-cert.ps1",
+    "release:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/windows/build-release.ps1"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^24.2.3",
     "typescript": "^5.6.3"
   }
 }

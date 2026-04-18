@@ -1,53 +1,43 @@
 # CVCreator
 
-Desktop-first, local-first CV creator built as a Tauri + React + TypeScript monorepo. The app is no longer just a scaffold: the current repo contains a working editor with live preview, explicit save/load, theming and layout controls, custom sections, rich content overrides, and real PDF export.
+Desktop-first, local-first CV creator built as a Tauri + React + TypeScript monorepo.
 
-## Current State
-
-The current app supports:
-
-- studio / preview / inspector workflow with a centered A4 preview
-- drag and drop for sections and entries, plus right-click context menus
-- built-in resume sections and user-created custom sections
-- optional structured entry parts with per-part title visibility and value visibility
-- photo support with layout-aware hero placement
-- per-area Markdown and HTML overrides
-- typography and layout controls including per-area line-height, paragraph spacing, and structured field gap
-- theme presets, app-shell theme presets, and layout presets with a custom layout mode
-- explicit `Save CV` / `Load CV` document management
-- HTML export and real PDF export driven from the same rendering pipeline used by preview
-
-Document files are currently saved as `.cvcreator.json`.
-
-## Workspace Layout
-
-- `apps/desktop`: React/Vite editor UI and Tauri desktop shell
-- `packages/document-model`: canonical CV schema, defaults, presets, and normalization
-- `packages/rendering`: HTML / Markdown rendering helpers used by preview and export
-- `packages/template-engine`: layout/template compatibility analysis
-- `docs/IMPLEMENTATION_PLAN.md`: implementation roadmap and product rules
+Use it to build CVs with a live preview, explicit file save/load, theme and layout controls, custom sections, and HTML/PDF export.
 
 ## Getting Started
 
-### Prerequisites
+## Requirements
 
-- Node.js with npm
+- Node.js 20+ with npm
 - Rust toolchain for the Tauri desktop runtime
 - Tauri system dependencies for your platform if you want to run the native shell
+- Windows if you want to produce the current installer target
 
-### Run In Browser Dev Mode
+## Install
 
 ```bash
 npm install
+```
+
+## Run In Browser Dev Mode
+
+```bash
 npm run dev
 ```
 
-### Run As Desktop App
+## Run As Desktop App
 
 ```bash
-npm install
 npm run tauri:dev
 ```
+
+## Build Desktop Installer
+
+```bash
+npm run tauri:build
+```
+
+That writes the Windows NSIS installer to `apps/desktop/src-tauri/target/release/bundle/nsis`.
 
 ## Validation
 
@@ -59,9 +49,33 @@ npm run build
 cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
 ```
 
+## Release & Installer
+
+Windows installer creation follows the same overall pattern as UniGit:
+
+- semantic-release runs from `.github/workflows/release.yml` on pushes to `main`
+- a Windows release job checks out the new tag, imports a PFX certificate, builds the signed NSIS installer, and uploads the installer assets to the GitHub release
+- local Windows packaging uses the PowerShell helpers in `scripts/windows`
+
+Useful local commands:
+
+```bash
+npm run release:windows:cert -- -Password "choose-a-password"
+npm run release:windows
+```
+
+The local release build emits installer artifacts under `apps/desktop/src-tauri/target/release/bundle/nsis`.
+
+GitHub Actions expects these secrets:
+
+- `WINDOWS_CERTIFICATE`: base64-encoded `.pfx` file
+- `WINDOWS_CERTIFICATE_PASSWORD`: password for the `.pfx`
+- `CVCREATOR_TIMESTAMP_URL`: optional RFC 3161 timestamp URL used during signing
+
 ## Save / Load Behavior
 
 - `Save CV` and `Load CV` manage any number of explicit document files.
+- Document files are stored as `.cvcreator.json`.
 - In Tauri, save/load uses native dialogs and Rust file IO.
 - In browser dev mode, the app uses browser file APIs when available and falls back to upload/download behavior.
 
@@ -70,11 +84,6 @@ cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
 - `Export HTML` writes the rendered document HTML.
 - `Export PDF` uses the same rendering path as preview/export HTML, then captures it for a real PDF download.
 
-## Notes
+## Disclaimer
 
-- This repository is desktop-first, but browser dev mode is useful for fast iteration.
-- The project is designed to keep preview and export visually aligned by sharing a single rendering system.
-
-## Plan
-
-The detailed implementation plan lives in `docs/IMPLEMENTATION_PLAN.md`.
+This project is mostly vibe-coded with GPT-5.4 via GitHub Copilot, with human oversight, iteration, and manual fixes around the core flows. Use it at your own discretion.

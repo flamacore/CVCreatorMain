@@ -25,7 +25,43 @@
     }
   },
   "bundle": {
-    "active": false,
-    "targets": "all"
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "category": "Productivity",
+    "publisher": "flamacore",
+    "homepage": "https://github.com/flamacore/CVCreatorMain",
+    "shortDescription": "A desktop-first CV creator with live preview, precise layout control, and export workflows.",
+    "longDescription": "CVCreator is a desktop-first CV builder for dense editing, live document preview, section-level layout control, explicit save and load workflows, and HTML/PDF export. It ships as a Windows NSIS installer and supports local self-signed packaging for release validation.",
+    "windows": {
+      "allowDowngrades": false,
+      "digestAlgorithm": "sha256",
+      "signCommand": {
+        "cmd": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "./windows/sign-cvcreator.ps1",
+          "-BinaryPath",
+          "%1"
+        ]
+      },
+      "webviewInstallMode": {
+        "type": "embedBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "startMenuFolder": "CVCreator",
+        "installerIcon": "./icons/icon.ico",
+        "displayLanguageSelector": false
+      }
+    }
   }
 }
