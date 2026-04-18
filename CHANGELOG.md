@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/flamacore/CVCreatorMain/compare/v1.1.2...v1.2.0) (2026-04-18)
+
+### Features
+
+* update version to 1.1.2 and add export file functionality ([fa96dd1](https://github.com/flamacore/CVCreatorMain/commit/fa96dd101f2cfdb179829e2da4397b5c3203b49b))
+
 ## [1.1.2](https://github.com/flamacore/CVCreatorMain/compare/v1.1.1...v1.1.2) (2026-04-18)
 
 ### Bug Fixes
