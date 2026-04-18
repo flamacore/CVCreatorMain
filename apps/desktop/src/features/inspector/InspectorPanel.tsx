@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState, type DragEvent, type MouseEvent } from "react";
 
 import type { SectionFrame, SectionInstance, SectionPlacement } from "@cvcreator/document-model";
 
@@ -111,6 +111,15 @@ export const InspectorPanel = ({
       ...current,
       [itemId]: !(current[itemId] ?? false),
     }));
+  };
+
+  const handleItemDragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (!Array.from(event.dataTransfer.types).includes("application/x-cvcreator-item")) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
   };
 
   const canEditFieldStructure = section.type === "custom";
@@ -266,19 +275,11 @@ export const InspectorPanel = ({
                   <div
                     key={item.id}
                     className="item-card foldable-item"
-                    draggable
                     onContextMenu={(event) => {
                       event.preventDefault();
                       onItemContextMenuOpen(event, section.id, item.id);
                     }}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData(
-                        "application/x-cvcreator-item",
-                        JSON.stringify({ sectionId: section.id, itemId: item.id }),
-                      );
-                      event.dataTransfer.effectAllowed = "move";
-                    }}
+                    onDragOver={handleItemDragOver}
                     onDrop={(event) => {
                       event.preventDefault();
                       const serialized = event.dataTransfer.getData("application/x-cvcreator-item");
@@ -300,6 +301,26 @@ export const InspectorPanel = ({
                     </button>
 
                     <div className="item-actions compact-item-actions">
+                      <button
+                        aria-label="Drag entry"
+                        className="ghost-button compact-button drag-handle-button"
+                        draggable
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }}
+                        onDragStart={(event) => {
+                          event.stopPropagation();
+                          const payload = JSON.stringify({ sectionId: section.id, itemId: item.id });
+                          event.dataTransfer.setData("application/x-cvcreator-item", payload);
+                          event.dataTransfer.setData("text/plain", payload);
+                          event.dataTransfer.effectAllowed = "move";
+                        }}
+                        title="Drag to reorder"
+                        type="button"
+                      >
+                        Drag
+                      </button>
                       <button className="ghost-button compact-button" onClick={() => onDuplicateItem(section.id, item.id)} type="button">
                         Duplicate
                       </button>

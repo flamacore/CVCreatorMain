@@ -158,10 +158,23 @@ export const EditorWorkspace = ({
     }));
   };
 
+  const handleCanvasDragOver = (event: React.DragEvent<HTMLElement>) => {
+    const types = Array.from(event.dataTransfer.types);
+    const isSectionMove = types.includes("application/x-cvcreator-section");
+    const isLibraryAdd = types.includes("application/x-cvcreator-library");
+
+    if (!isSectionMove && !isLibraryAdd) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = isLibraryAdd ? "copy" : "move";
+  };
+
   return (
     <section
       className="panel editor-panel"
-      onDragOver={(event) => event.preventDefault()}
+      onDragOver={handleCanvasDragOver}
       onDrop={(event) => {
         event.preventDefault();
 
@@ -465,19 +478,27 @@ export const EditorWorkspace = ({
                   <div
                     key={section.id}
                     className={`section-card compact-card${selectedSectionId === section.id ? " selected" : ""}${collapsed ? " collapsed" : ""}`}
-                    draggable
                     onClick={() => onSelect(section.id)}
                     onContextMenu={(event) => {
                       event.preventDefault();
                       onContextMenuOpen(event, section.id);
                     }}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData("application/x-cvcreator-section", section.id);
-                      event.dataTransfer.effectAllowed = "move";
+                    onDragOver={(event) => {
+                      const types = Array.from(event.dataTransfer.types);
+                      const isSectionMove = types.includes("application/x-cvcreator-section");
+                      const isLibraryAdd = types.includes("application/x-cvcreator-library");
+
+                      if (!isSectionMove && !isLibraryAdd) {
+                        return;
+                      }
+
+                      event.preventDefault();
+                      event.stopPropagation();
+                      event.dataTransfer.dropEffect = isLibraryAdd ? "copy" : "move";
                     }}
                     onDrop={(event) => {
                       event.preventDefault();
+                      event.stopPropagation();
 
                       const movedSectionId = event.dataTransfer.getData("application/x-cvcreator-section");
                       const revealedType = event.dataTransfer.getData("application/x-cvcreator-library") as SectionType;
@@ -500,6 +521,25 @@ export const EditorWorkspace = ({
                       </div>
 
                       <div className="section-badges compact-badges">
+                        <button
+                          aria-label={`Drag ${section.title}`}
+                          className="ghost-button compact-button drag-handle-button"
+                          draggable
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                          }}
+                          onDragStart={(event) => {
+                            event.stopPropagation();
+                            event.dataTransfer.setData("application/x-cvcreator-section", section.id);
+                            event.dataTransfer.setData("text/plain", section.id);
+                            event.dataTransfer.effectAllowed = "move";
+                          }}
+                          title="Drag to reorder"
+                          type="button"
+                        >
+                          Drag
+                        </button>
                         <button
                           aria-label={collapsed ? `Expand ${section.title}` : `Collapse ${section.title}`}
                           className="ghost-button compact-button icon-button"
