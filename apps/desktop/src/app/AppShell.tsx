@@ -527,15 +527,13 @@ export const AppShell = ({ builder }: AppShellProps) => {
           title="Drag to resize the studio panel. Double-click to reset."
         />
 
-        <div className="workspace-pane workspace-pane-preview">
-          <PreviewPane
-            document={builder.document}
-            layout={builder.selectedLayout}
-            onContextMenuOpen={openSectionMenu}
-            onSelect={builder.actions.selectSection}
-            selectedSectionId={builder.selectedSection?.id ?? null}
-          />
-        </div>
+        <PreviewPane
+          document={builder.document}
+          layout={builder.selectedLayout}
+          onContextMenuOpen={openSectionMenu}
+          onSelect={builder.actions.selectSection}
+          selectedSectionId={builder.selectedSection?.id ?? null}
+        />
 
         <div
           aria-label="Resize inspector panel"

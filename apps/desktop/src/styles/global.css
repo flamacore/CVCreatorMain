@@ -249,13 +249,13 @@ textarea {
   grid-column: 1;
 }
 
-.workspace-pane-preview {
-  grid-column: 3;
-  min-width: 0;
-}
-
 .workspace-pane-inspector {
   grid-column: 5;
+}
+
+.preview-panel {
+  grid-column: 3;
+  min-width: 0;
 }
 
 .workspace-resizer {
@@ -807,7 +807,7 @@ textarea {
     grid-column: 1;
   }
 
-  .workspace-pane-preview {
+  .preview-panel {
     grid-column: 2;
   }
 
@@ -846,7 +846,7 @@ textarea {
   }
 
   .workspace-pane-studio,
-  .workspace-pane-preview,
+  .preview-panel,
   .workspace-pane-inspector {
     grid-column: 1 / -1;
   }
