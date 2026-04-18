@@ -471,8 +471,10 @@ export const EditorWorkspace = ({
 
           {!collapsedGroups.sections ? (
             <div className="compact-section-list">
-              {sections.map((section) => {
+              {sections.map((section, sectionIndex) => {
                 const collapsed = collapsedSections[section.id] ?? true;
+                const previousSection = sections[sectionIndex - 1];
+                const nextSection = sections[sectionIndex + 1];
 
                 return (
                   <div
@@ -522,23 +524,36 @@ export const EditorWorkspace = ({
 
                       <div className="section-badges compact-badges">
                         <button
-                          aria-label={`Drag ${section.title}`}
-                          className="ghost-button compact-button drag-handle-button"
-                          draggable
+                          aria-label={`Move ${section.title} up`}
+                          className="ghost-button compact-button icon-button"
+                          disabled={!previousSection}
                           onClick={(event) => {
-                            event.preventDefault();
                             event.stopPropagation();
+
+                            if (previousSection) {
+                              onMoveSection(section.id, previousSection.id);
+                            }
                           }}
-                          onDragStart={(event) => {
-                            event.stopPropagation();
-                            event.dataTransfer.setData("application/x-cvcreator-section", section.id);
-                            event.dataTransfer.setData("text/plain", section.id);
-                            event.dataTransfer.effectAllowed = "move";
-                          }}
-                          title="Drag to reorder"
+                          title="Move up"
                           type="button"
                         >
-                          Drag
+                          ↑
+                        </button>
+                        <button
+                          aria-label={`Move ${section.title} down`}
+                          className="ghost-button compact-button icon-button"
+                          disabled={!nextSection}
+                          onClick={(event) => {
+                            event.stopPropagation();
+
+                            if (nextSection) {
+                              onMoveSection(section.id, nextSection.id);
+                            }
+                          }}
+                          title="Move down"
+                          type="button"
+                        >
+                          ↓
                         </button>
                         <button
                           aria-label={collapsed ? `Expand ${section.title}` : `Collapse ${section.title}`}

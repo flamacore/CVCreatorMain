@@ -207,16 +207,6 @@ textarea {
   justify-content: center;
 }
 
-.drag-handle-button {
-  width: auto;
-  min-width: 0;
-  cursor: grab;
-}
-
-.drag-handle-button:active {
-  cursor: grabbing;
-}
-
 .secondary-button {
   background: var(--accent);
   color: white;

@@ -1,4 +1,4 @@
-import { useEffect, useState, type DragEvent, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 import type { SectionFrame, SectionInstance, SectionPlacement } from "@cvcreator/document-model";
 
@@ -111,15 +111,6 @@ export const InspectorPanel = ({
       ...current,
       [itemId]: !(current[itemId] ?? false),
     }));
-  };
-
-  const handleItemDragOver = (event: DragEvent<HTMLDivElement>) => {
-    if (!Array.from(event.dataTransfer.types).includes("application/x-cvcreator-item")) {
-      return;
-    }
-
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
   };
 
   const canEditFieldStructure = section.type === "custom";
@@ -265,34 +256,23 @@ export const InspectorPanel = ({
             {openBlocks.items ? (
               <>
                 <div className="inline-heading compact-actions-row">
-                  <span className="meta-copy">Drag entries to reorder. Right-click for the item menu.</span>
+                  <span className="meta-copy">Use the arrows to reorder. Right-click for the item menu.</span>
                   <button className="ghost-button compact-button" onClick={() => onAddItem(section.id)} type="button">
                     Add entry
                   </button>
                 </div>
 
-                {section.items.map((item) => (
+                {section.items.map((item, itemIndex) => {
+                  const previousItem = section.items[itemIndex - 1];
+                  const nextItem = section.items[itemIndex + 1];
+
+                  return (
                   <div
                     key={item.id}
                     className="item-card foldable-item"
                     onContextMenu={(event) => {
                       event.preventDefault();
                       onItemContextMenuOpen(event, section.id, item.id);
-                    }}
-                    onDragOver={handleItemDragOver}
-                    onDrop={(event) => {
-                      event.preventDefault();
-                      const serialized = event.dataTransfer.getData("application/x-cvcreator-item");
-
-                      if (!serialized) {
-                        return;
-                      }
-
-                      const payload = JSON.parse(serialized) as { sectionId: string; itemId: string };
-
-                      if (payload.sectionId === section.id) {
-                        onMoveItem(section.id, payload.itemId, item.id);
-                      }
                     }}
                   >
                     <button aria-label={openItems[item.id] ? "Collapse entry" : "Expand entry"} className="block-toggle item-toggle" onClick={() => toggleItem(item.id)} type="button">
@@ -302,24 +282,36 @@ export const InspectorPanel = ({
 
                     <div className="item-actions compact-item-actions">
                       <button
-                        aria-label="Drag entry"
-                        className="ghost-button compact-button drag-handle-button"
-                        draggable
+                        aria-label="Move entry up"
+                        className="ghost-button compact-button icon-button"
+                        disabled={!previousItem}
                         onClick={(event) => {
-                          event.preventDefault();
                           event.stopPropagation();
+
+                          if (previousItem) {
+                            onMoveItem(section.id, item.id, previousItem.id);
+                          }
                         }}
-                        onDragStart={(event) => {
-                          event.stopPropagation();
-                          const payload = JSON.stringify({ sectionId: section.id, itemId: item.id });
-                          event.dataTransfer.setData("application/x-cvcreator-item", payload);
-                          event.dataTransfer.setData("text/plain", payload);
-                          event.dataTransfer.effectAllowed = "move";
-                        }}
-                        title="Drag to reorder"
+                        title="Move up"
                         type="button"
                       >
-                        Drag
+                        ↑
+                      </button>
+                      <button
+                        aria-label="Move entry down"
+                        className="ghost-button compact-button icon-button"
+                        disabled={!nextItem}
+                        onClick={(event) => {
+                          event.stopPropagation();
+
+                          if (nextItem) {
+                            onMoveItem(section.id, item.id, nextItem.id);
+                          }
+                        }}
+                        title="Move down"
+                        type="button"
+                      >
+                        ↓
                       </button>
                       <button className="ghost-button compact-button" onClick={() => onDuplicateItem(section.id, item.id)} type="button">
                         Duplicate
@@ -422,7 +414,8 @@ export const InspectorPanel = ({
                       </>
                     ) : null}
                   </div>
-                ))}
+                  );
+                })}
               </>
             ) : null}
           </div>
