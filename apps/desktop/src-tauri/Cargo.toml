@@ -1,6 +1,6 @@
 [package]
 name = "cvcreator-desktop"
-version = "0.1.0"
+version = "1.0.0"
 description = "Desktop runtime for CVCreator"
 authors = ["GitHub Copilot"]
 edition = "2021"
