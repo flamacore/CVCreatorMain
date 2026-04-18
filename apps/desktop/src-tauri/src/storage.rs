@@ -106,6 +106,26 @@ fn ensure_document_extension(path: PathBuf) -> PathBuf {
     path.with_file_name(updated_name)
 }
 
+fn ensure_file_extension(path: PathBuf, extension: &str) -> PathBuf {
+    let Some(file_name) = path.file_name().and_then(|name| name.to_str()) else {
+        return path;
+    };
+
+    let normalized_extension = extension.trim().trim_start_matches('.').to_ascii_lowercase();
+
+    if normalized_extension.is_empty() {
+        return path;
+    }
+
+    let expected_suffix = format!(".{}", normalized_extension);
+
+    if file_name.to_ascii_lowercase().ends_with(&expected_suffix) {
+        return path;
+    }
+
+    path.with_file_name(format!("{}{}", file_name, expected_suffix))
+}
+
 fn write_document_path(path: &Path, content: &str) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|error| error.to_string())?;
@@ -181,6 +201,43 @@ pub fn save_document_file(
     );
 
     write_document_path(&selected_path, &content)?;
+
+    Ok(Some(selected_path.to_string_lossy().into_owned()))
+}
+
+#[tauri::command]
+pub fn save_export_file(
+    app: AppHandle,
+    suggested_name: String,
+    file_type_description: String,
+    extension: String,
+    bytes: Vec<u8>,
+) -> Result<Option<String>, String> {
+    let normalized_extension = extension.trim().trim_start_matches('.').to_ascii_lowercase();
+    let file_path = app
+        .dialog()
+        .file()
+        .add_filter(&file_type_description, &[normalized_extension.as_str()])
+        .set_title(format!("Export {}", file_type_description))
+        .set_file_name(suggested_name)
+        .blocking_save_file();
+
+    let Some(file_path) = file_path else {
+        return Ok(None);
+    };
+
+    let selected_path = ensure_file_extension(
+        file_path
+            .into_path()
+            .map_err(|error| error.to_string())?,
+        &normalized_extension,
+    );
+
+    if let Some(parent) = selected_path.parent() {
+        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+    }
+
+    fs::write(&selected_path, bytes).map_err(|error| error.to_string())?;
 
     Ok(Some(selected_path.to_string_lossy().into_owned()))
 }

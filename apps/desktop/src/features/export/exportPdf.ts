@@ -1,8 +1,39 @@
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { invoke } from "@tauri-apps/api/core";
+
+import { isTauriRuntime } from "../state/persistence";
 
 const A4_WIDTH_MM = 210;
 const A4_HEIGHT_MM = 297;
+
+const createPdfExportDiagnostics = () => {
+  const entries: string[] = [];
+
+  return {
+    entries,
+    push: (message: string) => {
+      entries.push(message);
+    },
+  };
+};
+
+const toErrorMessage = (error: unknown) => {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.trim()) {
+    return error;
+  }
+
+  return "Unknown PDF export error.";
+};
+
+const buildPdfExportFailure = (error: unknown, diagnostics: string[]) => {
+  const detailLines = diagnostics.length > 0 ? `\n\nDiagnostics:\n- ${diagnostics.join("\n- ")}` : "";
+  return new Error(`PDF export failed: ${toErrorMessage(error)}${detailLines}`);
+};
 
 const waitForDocumentReady = async (iframeDocument: Document) => {
   if (iframeDocument.readyState === "complete") {
@@ -44,9 +75,45 @@ const waitForImages = async (iframeDocument: Document) => {
         }),
     ),
   );
+
+  return images.length;
 };
 
 const buildPdfFileName = (title: string) => `${title.replace(/\s+/g, "-").toLowerCase() || "resume"}.pdf`;
+
+const savePdfBlob = async (blob: Blob, title: string, diagnostics: ReturnType<typeof createPdfExportDiagnostics>) => {
+  if (isTauriRuntime()) {
+    diagnostics.push(`runtime=tauri`);
+    diagnostics.push(`save-command suggested=${buildPdfFileName(title)}`);
+
+    const selectedPath = await invoke<string | null>("save_export_file", {
+      suggestedName: buildPdfFileName(title),
+      fileTypeDescription: "PDF",
+      extension: "pdf",
+      bytes: Array.from(new Uint8Array(await blob.arrayBuffer())),
+    });
+
+    if (!selectedPath) {
+      diagnostics.push("save-command result=cancelled");
+      return;
+    }
+
+    diagnostics.push(`save-command result=${selectedPath}`);
+    diagnostics.push(`write-file bytes=${blob.size}`);
+    diagnostics.push("write-file result=success");
+    return;
+  }
+
+  diagnostics.push("runtime=browser");
+  diagnostics.push(`download file=${buildPdfFileName(title)}`);
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const anchor = window.document.createElement("a");
+  anchor.href = downloadUrl;
+  anchor.download = buildPdfFileName(title);
+  anchor.click();
+  window.URL.revokeObjectURL(downloadUrl);
+  diagnostics.push("download result=success");
+};
 
 const injectPdfOverrides = (iframeDocument: Document) => {
   const overrideStyle = iframeDocument.createElement("style");
@@ -88,6 +155,7 @@ const injectPdfOverrides = (iframeDocument: Document) => {
 };
 
 export const exportPdfFromHtml = async (html: string, title: string) => {
+  const diagnostics = createPdfExportDiagnostics();
   const iframe = window.document.createElement("iframe");
   iframe.setAttribute("aria-hidden", "true");
   iframe.style.position = "fixed";
@@ -100,6 +168,7 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
   iframe.style.border = "0";
 
   window.document.body.appendChild(iframe);
+  diagnostics.push(`iframe appended title=${title || "untitled"}`);
 
   try {
     const iframeDocument = iframe.contentDocument;
@@ -111,15 +180,22 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
     iframeDocument.open();
     iframeDocument.write(html);
     iframeDocument.close();
+    diagnostics.push(`iframe document written readyState=${iframeDocument.readyState}`);
 
     await waitForDocumentReady(iframeDocument);
+    diagnostics.push(`document readyState=${iframeDocument.readyState}`);
     injectPdfOverrides(iframeDocument);
+    diagnostics.push("pdf overrides injected");
 
     if ("fonts" in iframeDocument) {
       await iframeDocument.fonts.ready.catch(() => undefined);
+      diagnostics.push("fonts ready=resolved");
+    } else {
+      diagnostics.push("fonts ready=unsupported");
     }
 
-    await waitForImages(iframeDocument);
+    const imageCount = await waitForImages(iframeDocument);
+    diagnostics.push(`images ready count=${imageCount}`);
 
     const page = iframeDocument.querySelector<HTMLElement>(".cv-page");
 
@@ -132,6 +208,9 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
     const a4AspectRatio = A4_HEIGHT_MM / A4_WIDTH_MM;
     const pageAspectRatio = pageHeightPx / pageWidthPx;
     const isSingleA4Page = Math.abs(pageAspectRatio - a4AspectRatio) < 0.02;
+    diagnostics.push(
+      `page size=${pageWidthPx}x${pageHeightPx} singleA4=${isSingleA4Page} aspect=${pageAspectRatio.toFixed(4)}`,
+    );
 
     const canvas = await html2canvas(page, {
       scale: 2,
@@ -144,8 +223,10 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
       windowWidth: pageWidthPx,
       windowHeight: pageHeightPx,
     });
+    diagnostics.push(`canvas size=${canvas.width}x${canvas.height}`);
 
     const imageData = canvas.toDataURL("image/png");
+    diagnostics.push(`png length=${imageData.length}`);
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -173,12 +254,16 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
     }
 
     const pdfBlob = pdf.output("blob");
-    const downloadUrl = window.URL.createObjectURL(pdfBlob);
-    const anchor = window.document.createElement("a");
-    anchor.href = downloadUrl;
-    anchor.download = buildPdfFileName(title);
-    anchor.click();
-    window.URL.revokeObjectURL(downloadUrl);
+    diagnostics.push(`pdf blob size=${pdfBlob.size}`);
+    await savePdfBlob(pdfBlob, title, diagnostics);
+    diagnostics.push("export result=success");
+    console.info("PDF export diagnostics", diagnostics.entries);
+  } catch (error) {
+    console.error("PDF export failed", {
+      error,
+      diagnostics: diagnostics.entries,
+    });
+    throw buildPdfExportFailure(error, diagnostics.entries);
   } finally {
     iframe.remove();
   }

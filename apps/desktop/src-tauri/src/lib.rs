@@ -10,6 +10,7 @@ pub fn run() {
             storage::save_document,
             storage::open_document_file,
             storage::save_document_file,
+            storage::save_export_file,
             storage::read_document_file,
             storage::write_document_file
         ])
