@@ -231,9 +231,81 @@ textarea {
 
 .workspace-grid {
   display: grid;
-  grid-template-columns: minmax(15rem, 18.5rem) minmax(44rem, 1fr) minmax(18rem, 23rem);
+  grid-template-columns:
+    minmax(15rem, var(--workspace-studio-width, 18.5rem))
+    var(--workspace-resizer-width, 12px)
+    minmax(var(--workspace-preview-min-width, 30rem), 1fr)
+    var(--workspace-resizer-width, 12px)
+    minmax(18rem, var(--workspace-inspector-width, 23rem));
   gap: calc(0.55rem * var(--density-scale));
   align-items: start;
+}
+
+.workspace-pane {
+  min-width: 0;
+}
+
+.workspace-pane-studio {
+  grid-column: 1;
+}
+
+.workspace-pane-preview {
+  grid-column: 3;
+  min-width: 0;
+}
+
+.workspace-pane-inspector {
+  grid-column: 5;
+}
+
+.workspace-resizer {
+  position: relative;
+  min-height: calc(100vh - 10rem);
+  border-radius: 999px;
+  outline: none;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.workspace-resizer::before {
+  content: "";
+  position: absolute;
+  inset: calc(0.8rem * var(--density-scale)) 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--border) 74%, white);
+}
+
+.workspace-resizer::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.46rem;
+  height: 3.15rem;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 68%, white);
+  background: color-mix(in srgb, var(--surface-alt) 92%, var(--surface));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.workspace-resizer:hover::after,
+.workspace-resizer[data-active="true"]::after,
+.workspace-resizer:focus-visible::after {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-alt));
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.workspace-resizer-left {
+  grid-column: 2;
+}
+
+.workspace-resizer-right {
+  grid-column: 4;
 }
 
 .panel-heading {
@@ -731,8 +803,20 @@ textarea {
     grid-template-columns: minmax(15rem, 18.5rem) minmax(0, 1fr);
   }
 
-  .inspector-panel {
+  .workspace-pane-studio {
+    grid-column: 1;
+  }
+
+  .workspace-pane-preview {
+    grid-column: 2;
+  }
+
+  .workspace-pane-inspector {
     grid-column: 1 / -1;
+  }
+
+  .workspace-resizer {
+    display: none;
   }
 }
 
@@ -759,6 +843,12 @@ textarea {
     position: static;
     top: auto;
     max-height: none;
+  }
+
+  .workspace-pane-studio,
+  .workspace-pane-preview,
+  .workspace-pane-inspector {
+    grid-column: 1 / -1;
   }
 
   .preview-stage {
