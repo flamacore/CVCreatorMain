@@ -116,6 +116,7 @@ export const PreviewPane = ({
     fontFamily: document.typography.bodyFontFamily,
     fontSize: `${document.typography.baseFontSize * document.page.zoom}px`,
     lineHeight: String(document.typography.lineHeight),
+    ["--section-gap" as string]: `${layoutSettings.sectionGap * document.page.zoom}px`,
     ["--structured-field-gap" as string]: `${layoutSettings.structuredFieldGap * document.page.zoom}px`,
     ["--paragraph-space-before" as string]: `${layoutSettings.paragraphSpacingBefore * document.page.zoom}px`,
     ["--paragraph-space-after" as string]: `${layoutSettings.paragraphSpacingAfter * document.page.zoom}px`,
@@ -125,7 +126,6 @@ export const PreviewPane = ({
     fontSize: `${document.typography.titleFontSize * document.page.zoom}px`,
   };
   const sectionTitleStyle = {
-    fontFamily: document.typography.headingFontFamily,
     fontSize: `${document.typography.sectionTitleFontSize * document.page.zoom}px`,
   };
   const previewName = document.layoutId === "custom-layout" ? "Custom Layout" : layout.name;
@@ -191,7 +191,10 @@ export const PreviewPane = ({
       tabIndex={0}
     >
       <h3 style={sectionTitleStyle}>{section.title}</h3>
-      <div dangerouslySetInnerHTML={{ __html: section.html }} />
+      <div
+        className={`preview-section-body preview-section-body-columns-${section.frame.columns}`}
+        dangerouslySetInnerHTML={{ __html: section.html }}
+      />
     </div>
   );
 

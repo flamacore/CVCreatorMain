@@ -31,6 +31,7 @@ export const defaultSectionFrame: SectionFrame = {
   padding: 12,
   fontScale: 1,
   lineHeightMultiplier: 1,
+  columns: 1,
 };
 
 export const defaultSurfaceStyle: SurfaceStyle = {

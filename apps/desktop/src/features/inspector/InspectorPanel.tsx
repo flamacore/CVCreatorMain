@@ -202,6 +202,19 @@ export const InspectorPanel = ({
                   }
                 />
               </label>
+
+              <label className="control">
+                <span>Area columns</span>
+                <select
+                  value={section.frame.columns}
+                  onChange={(event) =>
+                    onSectionFrameChange(section.id, { columns: Number(event.target.value) as 1 | 2 })
+                  }
+                >
+                  <option value="1">One column</option>
+                  <option value="2">Two columns</option>
+                </select>
+              </label>
             </>
           ) : null}
         </div>

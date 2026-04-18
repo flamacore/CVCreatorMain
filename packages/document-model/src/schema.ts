@@ -31,6 +31,7 @@ export interface SectionFrame {
   padding: number;
   fontScale: number;
   lineHeightMultiplier: number;
+  columns: 1 | 2;
 }
 
 export type HeroPhotoMode = "inline" | "stacked" | "hidden";

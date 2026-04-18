@@ -112,7 +112,7 @@ const renderExportPreviewSections = (sections: Array<ReturnType<typeof renderDoc
     .map(
       (section) => `<section class="cv-section cv-section-${section.type} cv-section-${section.id}">
   <h3>${section.title}</h3>
-  <div class="cv-section-body">${section.html}</div>
+  <div class="cv-section-body cv-section-body-columns-${section.frame.columns}">${section.html}</div>
 </section>`,
     )
     .join("");
@@ -354,10 +354,18 @@ export const renderExportDocument = (
       .cv-section h3 {
         margin: 0 0 12px;
         color: var(--accent);
-        font-family: ${document.typography.headingFontFamily};
         font-size: ${document.typography.sectionTitleFontSize}px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+      }
+
+      .cv-section-body-columns-1 {
+        column-count: 1;
+      }
+
+      .cv-section-body-columns-2 {
+        column-count: 2;
+        column-gap: calc(var(--section-gap) * 0.75);
       }
 
       ${sectionStyles}
@@ -386,6 +394,22 @@ export const renderExportDocument = (
       .cv-section p {
         margin-top: var(--paragraph-space-before);
         margin-bottom: var(--paragraph-space-after);
+      }
+
+      .cv-section-body > * {
+        break-inside: avoid;
+      }
+
+      .preview-item,
+      .preview-empty,
+      .preview-photo-frame,
+      .preview-rich-text,
+      .preview-rich-text p,
+      .preview-rich-text ul,
+      .cv-section-body > p,
+      .cv-section-body > ul,
+      .cv-section-body > ol {
+        break-inside: avoid;
       }
 
       .preview-field-label {

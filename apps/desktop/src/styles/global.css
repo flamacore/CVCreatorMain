@@ -393,10 +393,16 @@ textarea {
 .preview-panel {
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: calc(0.5rem * var(--density-scale));
+  align-self: start;
+  max-height: calc(100vh - (1rem * var(--density-scale)));
   overflow: hidden;
 }
 
 .preview-stage {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -508,10 +514,24 @@ textarea {
   margin-bottom: 0.75rem;
 }
 
+.preview-section-body-columns-1 {
+  column-count: 1;
+}
+
+.preview-section-body-columns-2 {
+  column-count: 2;
+  column-gap: calc(var(--section-gap, 1rem) * 0.75);
+}
+
+.preview-section-body > * {
+  break-inside: avoid;
+}
+
 .preview-item {
   display: grid;
   gap: var(--structured-field-gap, calc(0.5rem * var(--density-scale)));
   margin-bottom: calc(0.9rem * var(--density-scale));
+  break-inside: avoid;
 }
 
 .preview-field {
@@ -534,6 +554,17 @@ textarea {
 .preview-photo-frame {
   overflow: hidden;
   border-radius: 16px;
+  break-inside: avoid;
+}
+
+.preview-empty,
+.preview-rich-text,
+.preview-rich-text p,
+.preview-rich-text ul,
+.preview-section-body > p,
+.preview-section-body > ul,
+.preview-section-body > ol {
+  break-inside: avoid;
 }
 
 .preview-photo {
@@ -722,6 +753,12 @@ textarea {
   .preview-panel,
   .inspector-panel {
     min-height: auto;
+  }
+
+  .preview-panel {
+    position: static;
+    top: auto;
+    max-height: none;
   }
 
   .preview-stage {
