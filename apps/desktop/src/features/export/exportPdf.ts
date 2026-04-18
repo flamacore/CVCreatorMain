@@ -205,11 +205,11 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
 
     const pageWidthPx = Math.ceil(page.offsetWidth);
     const pageHeightPx = Math.ceil(page.offsetHeight);
-    const a4AspectRatio = A4_HEIGHT_MM / A4_WIDTH_MM;
-    const pageAspectRatio = pageHeightPx / pageWidthPx;
-    const isSingleA4Page = Math.abs(pageAspectRatio - a4AspectRatio) < 0.02;
+    const renderedWidthMm = A4_WIDTH_MM;
+    const renderedHeightMm = (pageHeightPx * renderedWidthMm) / pageWidthPx;
+    const pdfPageHeightMm = Math.max(A4_HEIGHT_MM, Number(renderedHeightMm.toFixed(2)));
     diagnostics.push(
-      `page size=${pageWidthPx}x${pageHeightPx} singleA4=${isSingleA4Page} aspect=${pageAspectRatio.toFixed(4)}`,
+      `page size=${pageWidthPx}x${pageHeightPx} renderedMm=${renderedWidthMm.toFixed(2)}x${renderedHeightMm.toFixed(2)} pdfPageHeightMm=${pdfPageHeightMm.toFixed(2)}`,
     );
 
     const canvas = await html2canvas(page, {
@@ -230,28 +230,11 @@ export const exportPdfFromHtml = async (html: string, title: string) => {
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
-      format: "a4",
+      format: [A4_WIDTH_MM, pdfPageHeightMm],
       compress: true,
     });
-
-    if (isSingleA4Page) {
-      pdf.addImage(imageData, "PNG", 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM, undefined, "FAST");
-    } else {
-      const renderedWidth = A4_WIDTH_MM;
-      const renderedHeight = (pageHeightPx * renderedWidth) / pageWidthPx;
-      let remainingHeight = renderedHeight;
-      let offsetY = 0;
-
-      pdf.addImage(imageData, "PNG", 0, offsetY, renderedWidth, renderedHeight, undefined, "FAST");
-      remainingHeight -= A4_HEIGHT_MM;
-
-      while (remainingHeight > 0) {
-        offsetY = remainingHeight - renderedHeight;
-        pdf.addPage("a4", "portrait");
-        pdf.addImage(imageData, "PNG", 0, offsetY, renderedWidth, renderedHeight, undefined, "FAST");
-        remainingHeight -= A4_HEIGHT_MM;
-      }
-    }
+    diagnostics.push(`pagination=single-continuous-page`);
+    pdf.addImage(imageData, "PNG", 0, 0, renderedWidthMm, renderedHeightMm, undefined, "FAST");
 
     const pdfBlob = pdf.output("blob");
     diagnostics.push(`pdf blob size=${pdfBlob.size}`);
