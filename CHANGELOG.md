@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/flamacore/CVCreatorMain/compare/v1.1.0...v1.1.1) (2026-04-18)
+
+### Bug Fixes
+
+* implement dynamic workspace pane resizing and storage management ([82f1493](https://github.com/flamacore/CVCreatorMain/commit/82f1493c0ff3a4cd051661f594eee1e7ed88214b))
+
 ## [1.1.0](https://github.com/flamacore/CVCreatorMain/compare/v1.0.0...v1.1.0) (2026-04-18)
 
 ### Features
