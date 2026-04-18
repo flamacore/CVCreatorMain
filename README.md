@@ -1,5 +1,8 @@
 # CVCreator
 
+<img width="3840" alt="image" src="https://github.com/user-attachments/assets/61b32aea-c0f6-4eb6-9586-49353edf026c" />
+
+
 Desktop-first, local-first CV creator built as a Tauri + React + TypeScript monorepo.
 
 Use it to build CVs with a live preview, explicit file save/load, theme and layout controls, custom sections, and HTML/PDF export.
