@@ -2,12 +2,19 @@
 
 <img width="3840" alt="image" src="https://github.com/user-attachments/assets/61b32aea-c0f6-4eb6-9586-49353edf026c" />
 
+***
+
+
+>Author's note: This app is completely free and will always be. Just as a service to the community where sometimes job searching can be daunting & hard where even a single cent matters. Therefore, I don't see any ethical justification behind putting a price tag on high quality CV creation. That's my exact reason for creating this application.
+_______________
 
 Desktop-first, local-first CV creator built as a Tauri + React + TypeScript monorepo.
 
 Use it to build CVs with a live preview, explicit file save/load, theme and layout controls, custom sections, and HTML/PDF export.
 
 ## Getting Started
+Easiest install from [Releases](https://github.com/flamacore/CVCreatorMain/releases)
+Just download, install and launch.
 
 ## Requirements
 
