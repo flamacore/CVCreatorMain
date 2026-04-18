@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/flamacore/CVCreatorMain/compare/v1.1.1...v1.1.2) (2026-04-18)
+
+### Bug Fixes
+
+* update version to 1.1.1 and refactor preview pane styles ([4fb6405](https://github.com/flamacore/CVCreatorMain/commit/4fb6405a78d62880ba625b4f6b53642a94ed5221))
+
 ## [1.1.1](https://github.com/flamacore/CVCreatorMain/compare/v1.1.0...v1.1.1) (2026-04-18)
 
 ### Bug Fixes
