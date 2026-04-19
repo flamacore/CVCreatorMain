@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 import type { SectionFrame, SectionInstance, SectionPlacement } from "@cvcreator/document-model";
 
@@ -43,6 +43,12 @@ const handlePhotoFile = (
   reader.readAsDataURL(file);
 };
 
+const getDefaultOpenItems = (section: SectionInstance) => {
+  const visibleItems = section.items.length <= 2 ? section.items : section.items.slice(0, 1);
+
+  return Object.fromEntries(visibleItems.map((item) => [item.id, true]));
+};
+
 export const InspectorPanel = ({
   section,
   onTitleChange,
@@ -66,25 +72,60 @@ export const InspectorPanel = ({
   onPhotoUrlChange,
 }: InspectorPanelProps) => {
   const [openBlocks, setOpenBlocks] = useState<Record<string, boolean>>({
-    sizing: false,
+    sizing: true,
     photo: false,
-    items: false,
+    items: true,
     markdown: false,
     html: false,
   });
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+  const previousItemIdsRef = useRef<string[]>([]);
 
   useEffect(() => {
+    if (!section) {
+      setOpenBlocks({
+        sizing: true,
+        photo: false,
+        items: true,
+        markdown: false,
+        html: false,
+      });
+      setOpenItems({});
+      previousItemIdsRef.current = [];
+      return;
+    }
+
     setOpenBlocks({
-      sizing: false,
-      photo: false,
-      items: false,
+      sizing: true,
+      photo: section.type === "photo",
+      items: section.type !== "photo",
       markdown: false,
       html: false,
     });
 
-    setOpenItems({});
+    setOpenItems(getDefaultOpenItems(section));
+    previousItemIdsRef.current = section.items.map((item) => item.id);
   }, [section?.id]);
+
+  useEffect(() => {
+    if (!section) {
+      previousItemIdsRef.current = [];
+      return;
+    }
+
+    const currentItemIds = section.items.map((item) => item.id);
+    const addedItemIds = currentItemIds.filter((itemId) => !previousItemIdsRef.current.includes(itemId));
+
+    if (addedItemIds.length > 0) {
+      setOpenBlocks((current) => (current.items ? current : { ...current, items: true }));
+      setOpenItems((current) => ({
+        ...current,
+        ...Object.fromEntries(addedItemIds.map((itemId) => [itemId, true])),
+      }));
+    }
+
+    previousItemIdsRef.current = currentItemIds;
+  }, [section?.id, section?.items.map((item) => item.id).join("|")]);
 
   if (!section) {
     return (
@@ -149,7 +190,7 @@ export const InspectorPanel = ({
 
           {openBlocks.sizing ? (
             <>
-              <p className="meta-copy">Move with drag, resize here.</p>
+              <p className="meta-copy">Resize and tune this area here.</p>
 
               <label className="control slider-control">
                 <span>Minimum height {section.frame.minHeight}px</span>

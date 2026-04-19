@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type {
   BorderMode,
@@ -137,12 +137,26 @@ export const EditorWorkspace = ({
   onContextMenuOpen,
 }: EditorWorkspaceProps) => {
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
-    typography: true,
-    layout: true,
-    hidden: true,
-    sections: true,
+    typography: false,
+    layout: false,
+    hidden: hiddenSections.length === 0 && hiddenCustomSections.length === 0,
+    sections: false,
   });
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!selectedSectionId) {
+      return;
+    }
+
+    setCollapsedGroups((current) =>
+      current.sections ? { ...current, sections: false } : current,
+    );
+
+    setCollapsedSections((current) =>
+      current[selectedSectionId] === false ? current : { ...current, [selectedSectionId]: false },
+    );
+  }, [selectedSectionId]);
 
   const toggleGroup = (groupId: string) => {
     setCollapsedGroups((current) => ({

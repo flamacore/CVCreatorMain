@@ -27,6 +27,66 @@ body {
   font-family: var(--app-font-family);
 }
 
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color:
+    color-mix(in srgb, var(--accent, #79b8ff) 26%, var(--surface-alt, #1b2330))
+    color-mix(in srgb, var(--canvas-background, #0b1016) 82%, black);
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.shell::-webkit-scrollbar,
+.shell ::-webkit-scrollbar {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+.shell::-webkit-scrollbar-track,
+.shell ::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--canvas-background, #0b1016) 82%, black);
+  border-radius: 999px;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+.shell::-webkit-scrollbar-thumb,
+.shell ::-webkit-scrollbar-thumb {
+  min-height: 2.75rem;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent, #79b8ff) 36%, white),
+      color-mix(in srgb, var(--accent, #79b8ff) 18%, var(--surface-alt, #1b2330))
+    );
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+.shell::-webkit-scrollbar-thumb:hover,
+.shell ::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent, #79b8ff) 48%, white),
+      color-mix(in srgb, var(--accent, #79b8ff) 28%, var(--surface-alt, #1b2330))
+    );
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+.shell::-webkit-scrollbar-corner,
+.shell ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 button,
 input,
 select,
@@ -42,14 +102,28 @@ button,
 select,
 input,
 textarea {
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 18%, transparent);
   border-radius: 14px;
-  background: var(--surface-alt);
+  background: color-mix(in srgb, var(--surface-alt) 78%, var(--surface));
   color: var(--text-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 button {
   cursor: pointer;
+}
+
+button:hover {
+  background: color-mix(in srgb, var(--surface-alt) 90%, var(--surface));
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 input,
@@ -76,6 +150,14 @@ textarea {
     linear-gradient(180deg, color-mix(in srgb, var(--canvas-background) 88%, black), var(--canvas-background));
 }
 
+.shell,
+.shell * {
+  scrollbar-width: thin;
+  scrollbar-color:
+    color-mix(in srgb, var(--accent) 26%, var(--surface-alt))
+    color-mix(in srgb, var(--canvas-background) 82%, black);
+}
+
 .shell h1,
 .shell h2,
 .shell h3,
@@ -85,10 +167,10 @@ textarea {
 }
 
 .panel {
-  border: 1px solid color-mix(in srgb, var(--border) 80%, white);
+  border: 1px solid color-mix(in srgb, var(--border) 18%, transparent);
   border-radius: calc(18px * var(--density-scale));
   background: var(--surface);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
 }
 
 .command-bar {
@@ -215,7 +297,13 @@ textarea {
 
 .ghost-button,
 .notice-banner button {
-  background: transparent;
+  background: color-mix(in srgb, var(--surface-alt) 76%, transparent);
+  border-color: transparent;
+}
+
+.ghost-button:hover,
+.notice-banner button:hover {
+  background: color-mix(in srgb, var(--surface-alt) 94%, var(--surface));
 }
 
 .notice-banner {
@@ -223,7 +311,7 @@ textarea {
   justify-content: space-between;
   align-items: center;
   gap: calc(1rem * var(--density-scale));
-  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border));
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
   border-radius: 16px;
   padding: calc(0.65rem * var(--density-scale)) calc(0.8rem * var(--density-scale));
   background: color-mix(in srgb, var(--surface-alt) 88%, var(--surface));
@@ -274,7 +362,7 @@ textarea {
   width: 2px;
   transform: translateX(-50%);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--border) 74%, white);
+  background: color-mix(in srgb, var(--border) 42%, transparent);
 }
 
 .workspace-resizer::after {
@@ -286,9 +374,9 @@ textarea {
   height: 3.15rem;
   transform: translate(-50%, -50%);
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--border) 68%, white);
+  border: 1px solid color-mix(in srgb, var(--border) 10%, transparent);
   background: color-mix(in srgb, var(--surface-alt) 92%, var(--surface));
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
   transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
@@ -297,7 +385,7 @@ textarea {
 .workspace-resizer:focus-visible::after {
   background: color-mix(in srgb, var(--accent) 18%, var(--surface-alt));
   border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
 }
 
 .workspace-resizer-left {
@@ -339,9 +427,10 @@ textarea {
   width: 100%;
   padding: calc(0.5rem * var(--density-scale));
   text-align: left;
-  background: color-mix(in srgb, var(--surface-alt) 88%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--border) 68%, white);
+  background: color-mix(in srgb, var(--surface-alt) 72%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--border) 8%, transparent);
   border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .compact-stack {
@@ -385,20 +474,30 @@ textarea {
 
 .status-chip,
 .badge {
-  border: 1px solid color-mix(in srgb, var(--border) 72%, white);
+  border: 1px solid transparent;
   color: var(--text-muted);
+  background: color-mix(in srgb, var(--surface-alt) 82%, var(--surface));
 }
 
 .status-chip.active,
 .badge {
-  background: color-mix(in srgb, var(--accent) 10%, white);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-alt));
 }
 
 .section-card.selected,
-.preview-section.selected,
 .section-card:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--accent) 60%, white);
-  outline-offset: 2px;
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent),
+    0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
+.preview-section.selected {
+  outline: none;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent),
+    0 12px 26px rgba(16, 20, 24, 0.1);
 }
 
 .section-badges {
@@ -480,6 +579,34 @@ textarea {
   align-items: flex-start;
   overflow: auto;
   padding: calc(0.8rem * var(--density-scale));
+  scrollbar-color:
+    color-mix(in srgb, var(--cv-accent) 44%, white)
+    color-mix(in srgb, var(--surface) 84%, black);
+}
+
+.preview-stage::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--surface) 84%, black);
+}
+
+.preview-stage::-webkit-scrollbar-thumb {
+  border: 3px solid color-mix(in srgb, var(--surface) 84%, black);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--cv-accent) 60%, white),
+      color-mix(in srgb, var(--cv-accent) 34%, var(--surface-alt))
+    );
+  background-clip: padding-box;
+}
+
+.preview-stage::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--cv-accent) 72%, white),
+      color-mix(in srgb, var(--cv-accent) 42%, var(--surface-alt))
+    );
+  background-clip: padding-box;
 }
 
 .preview-page {
@@ -661,9 +788,9 @@ textarea {
   flex-direction: column;
   gap: calc(0.35rem * var(--density-scale));
   padding: calc(0.45rem * var(--density-scale));
-  border: 1px solid color-mix(in srgb, var(--border) 68%, white);
+  border: 1px solid color-mix(in srgb, var(--border) 6%, transparent);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--surface) 68%, transparent);
+  background: color-mix(in srgb, var(--surface-alt) 64%, var(--surface));
 }
 
 .field-editor-hidden {
@@ -718,11 +845,12 @@ textarea {
   min-width: 1.75rem;
   min-height: 1.75rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
-  background: color-mix(in srgb, var(--surface-alt) 92%, var(--surface));
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--surface-alt) 84%, var(--surface));
   color: var(--accent);
   font-size: 0.88rem;
   font-weight: 700;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 12%, transparent);
 }
 
 .item-toggle {
@@ -772,9 +900,9 @@ textarea {
   gap: 0.3rem;
   padding: 0.45rem;
   border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--border) 72%, white);
+  border: 1px solid color-mix(in srgb, var(--border) 12%, transparent);
   background: color-mix(in srgb, var(--surface) 95%, black);
-  box-shadow: 0 18px 50px rgba(18, 20, 24, 0.16);
+  box-shadow: 0 16px 36px rgba(18, 20, 24, 0.18);
 }
 
 .context-menu-item {
