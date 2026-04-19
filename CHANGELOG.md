@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/flamacore/CVCreatorMain/compare/v1.3.0...v1.4.0) (2026-04-19)
+
+### Features
+
+* update version to 1.3.0 and enhance UI with custom scrollbar styles ([7bd7e9c](https://github.com/flamacore/CVCreatorMain/commit/7bd7e9cd8561dca4f03a1510a89d71e7da4d8755))
+
 ## [1.3.0](https://github.com/flamacore/CVCreatorMain/compare/v1.2.0...v1.3.0) (2026-04-18)
 
 ### Features
